@@ -151,6 +151,14 @@ func (d *Driver) createFullSnapshot(ctx context.Context, input *runtimecontract.
 	if err := d.ensureDumpCapacity(ctx, plan); err != nil {
 		return nil, err
 	}
+	// Memory gate BEFORE any pause as well: the dump's page cache is charged
+	// to the VM's memory cgroup, which is held under a throttling line for
+	// the rest of the snapshot (dump_memory.go).
+	releaseDumpMemory, err := d.reserveSnapshotDumpMemory(plan)
+	if err != nil {
+		return nil, err
+	}
+	defer releaseDumpMemory()
 
 	dumpErr := d.dumpRunningSandbox(ctx, &plan)
 	if dumpErr != nil {

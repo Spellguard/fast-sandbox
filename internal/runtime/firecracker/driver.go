@@ -110,6 +110,9 @@ type Driver struct {
 	// snapshotFree overrides the staging filesystem probe in capacity tests.
 	// A nil value uses stagingFree.
 	snapshotFree func(string) int64
+	// dumpMemoryCgroup overrides the lookup of the cgroup that caps a VM's
+	// memory (dump_memory.go) in tests. A nil value uses vmMemoryCgroup.
+	dumpMemoryCgroup func(pid int) (string, error)
 	// fcVersion caches the last successfully resolved local Firecracker
 	// binary version (restore admission); unresolved lookups are retried.
 	fcVersion string

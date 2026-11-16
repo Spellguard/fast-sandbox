@@ -28,4 +28,8 @@ var (
 	// paused, after a best-effort cache GC). It is retryable: the caller
 	// parks the task instead of failing it, and retries when space frees.
 	ErrInsufficientStorage = errors.New("insufficient local storage for the snapshot artifact set")
+	// ErrInsufficientMemory reports that the memory cgroup capping the VM
+	// cannot hold the page cache of a full snapshot's memory dump (checked
+	// before the VM is paused). It is retryable like ErrInsufficientStorage.
+	ErrInsufficientMemory = errors.New("insufficient memory headroom for the snapshot memory dump")
 )

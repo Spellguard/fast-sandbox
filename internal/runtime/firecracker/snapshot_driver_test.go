@@ -47,9 +47,14 @@ type snapshotAgentFake struct {
 	manifest    map[string]any
 	sums        string
 	missingFile string
+	// onPublish, when set, runs at publication time.
+	onPublish func()
 }
 
 func (f *snapshotAgentFake) PublishImage(_ context.Context, _, kind, key, dir string) (PublishOutcome, error) {
+	if f.onPublish != nil {
+		f.onPublish()
+	}
 	payload, err := os.ReadFile(filepath.Join(dir, "manifest.json"))
 	if err != nil {
 		return PublishOutcome{}, err

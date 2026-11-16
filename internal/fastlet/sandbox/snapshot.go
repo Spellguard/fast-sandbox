@@ -278,6 +278,10 @@ func (m *SandboxManager) runSnapshotWorker(snapshotter RuntimeSnapshotter, task 
 				// nothing staged. Clients free space and re-issue with a new
 				// request_id (the object is one-shot).
 				reason = "InsufficientStorage"
+			} else if errors.Is(err, ErrInsufficientMemory) {
+				// Also rejected before the pause: the VM's memory cgroup
+				// cannot hold the dump's page cache.
+				reason = "InsufficientMemory"
 			}
 		}
 		klog.ErrorS(err, "Sandbox snapshot task failed",

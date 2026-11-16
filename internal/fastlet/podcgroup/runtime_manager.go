@@ -89,6 +89,11 @@ func (m *RuntimeManager) Prepare() error {
 	if err := writeMemoryLimit(aggregatePath, m.budget.Memory); err != nil {
 		return fmt.Errorf("apply aggregate Sandbox memory budget: %w", err)
 	}
+	// A snapshot dump lowers memory.high while it runs; a Fastlet that died
+	// mid-dump must not leave the surviving subtree throttled.
+	if err := writeOptionalControl(aggregatePath, "memory.high", "max"); err != nil {
+		return fmt.Errorf("reset aggregate Sandbox memory.high: %w", err)
+	}
 	if err := disableSwap(aggregatePath, "/proc/swaps"); err != nil {
 		return fmt.Errorf("disable aggregate Sandbox swap: %w", err)
 	}

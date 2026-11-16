@@ -168,6 +168,7 @@ ready. That path never involves the control plane or the manifest.
 | Symptom | Cause / action |
 | --- | --- |
 | `Failed` with `Completed.reason=InsufficientStorage` | Node-local staging space cannot hold the artifact set; the snapshot was **rejected before the VM was ever paused** (a best-effort image-cache GC already ran). Free node space and re-issue with a new `request_id` — distinct from a genuine failure, nothing was interrupted or staged |
+| `Failed` with `Completed.reason=InsufficientMemory` | The memory cgroup that caps the VM cannot be reclaimed far enough below its limit to hold the page cache of the memory dump (for example a guest whose memory is full in a Fastlet with no memory headroom); the snapshot was **rejected before the VM was ever paused**. While a full snapshot runs, the Fastlet keeps that cgroup's `memory.high` slightly below `memory.max`, so the dump is throttled rather than OOM-killed. Give the Fastlet more memory than the guest (for example `fastletOverhead` in legacy pools, or slot memory in ResourceAware pools) and re-issue |
 | `Failed: ... Forbidden`-family at publish | Agent has no write credential for the store; contact the platform operator |
 | `Failed: SandboxNotFound` / `SandboxUIDMismatch` | Target was deleted or recreated under the same name; re-issue against the current Sandbox |
 | `Failed: SnapshotLost` | The fastlet that owned the task restarted mid-flight; re-issue with a new `request_id` |
